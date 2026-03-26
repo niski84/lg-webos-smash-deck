@@ -1,0 +1,25 @@
+# Build
+/lgdeck
+*.exe
+
+# Local data (do not commit TV keys / MAC)
+/data/
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# E2E / Node
+e2e/node_modules/
+e2e/test-results/
+e2e/playwright-report/
+e2e/blob-report/
+e2e/screenshots/frames/
+e2e/.cache/
+e2e/test-data/
+
+# OS
+.DS_Store
+Thumbs.db

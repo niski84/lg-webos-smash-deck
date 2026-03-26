@@ -1,0 +1,1483 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LG WebOS Smash Deck</title>
+  <style>
+    /* ── LG Brand Palette ──────────────────────────── */
+    :root {
+      --bg: #0d0a0b;
+      --card: #181214;
+      --card-bg: #181214;
+      --border: #2e1e22;
+      --accent: #A50034;
+      --accent-bright: #E60028;
+      --accent-hover: #cc0040;
+      --text: #f0e8ea;
+      --muted: #a08890;
+      --ok: #3ddba5;
+      --warn: #f5a623;
+      --err-color: #ff6b6b;
+      --hero-border: #4a1a22;
+      --input-bg: #110c0e;
+      --input-border: #3a2028;
+      --input-color: #f0e8ea;
+      --body-bg-1: #1a0a0e;
+      --body-bg-2: #0e0608;
+      --body-bg-3: #080306;
+      --badge-dark: #2a1218;
+      --remote-btn: #1e1014;
+      --remote-btn-border: #3a2028;
+      --remote-btn-hover: #2e1820;
+      --vol-track: #2e1820;
+    }
+    body.light {
+      --bg: #f8f0f2;
+      --card: #ffffff;
+      --card-bg: #ffffff;
+      --border: #e0c8cc;
+      --accent: #A50034;
+      --accent-bright: #E60028;
+      --accent-hover: #cc0040;
+      --text: #1a0810;
+      --muted: #7a5060;
+      --ok: #1a9468;
+      --warn: #c07a10;
+      --err-color: #c01020;
+      --hero-border: #d0a0aa;
+      --input-bg: #fff;
+      --input-border: #d0b0b8;
+      --input-color: #1a0810;
+      --body-bg-1: #f8e0e4;
+      --body-bg-2: #f8f0f2;
+      --body-bg-3: #fff;
+      --badge-dark: #fce8ec;
+      --remote-btn: #f5ecee;
+      --remote-btn-border: #e0c8cc;
+      --remote-btn-hover: #fde0e6;
+      --vol-track: #f0d8dc;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: radial-gradient(circle at top, var(--body-bg-1) 0%, var(--body-bg-2) 50%, var(--body-bg-3) 100%);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.2s, color 0.2s;
+    }
+    body.compact #appHeader { display: none !important; }
+    body.compact #appHero   { display: none !important; }
+    body.compact { padding-top: 10px; }
+
+    /* ── Header ───────────────────────────────────── */
+    #appHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .page-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 2px solid var(--border);
+      background: linear-gradient(180deg, rgba(165,0,52,0.15) 0%, rgba(165,0,52,0.05) 100%);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      font-size: 1.15rem;
+    }
+    .lg-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      color: #fff;
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: -1px;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px rgba(165,0,52,0.5);
+    }
+    .header-actions { display: flex; gap: 8px; align-items: center; }
+    .theme-hero {
+      margin: 0 0 12px 0;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px dashed var(--hero-border);
+      background: rgba(165,0,52,0.04);
+      color: var(--muted);
+      font-size: 13px;
+      max-width: 960px;
+    }
+
+    /* ── Status bar ───────────────────────────────── */
+    #statusBar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(165,0,52,0.04);
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+    .status-item { display: flex; align-items: center; gap: 6px; }
+    .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+    .status-dot.on  { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+    .status-dot.off { background: #4a2830; }
+    .status-dot.unknown { background: var(--warn); }
+
+    /* ── Tabs ─────────────────────────────────────── */
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .tab-btn {
+      position: relative; overflow: hidden;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 2px solid transparent;
+      background: rgba(165,0,52,0.08);
+      color: var(--muted);
+      font-weight: 600; font-size: 13px; letter-spacing: 0.3px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .tab-btn:hover { background: rgba(165,0,52,0.18); color: var(--text); }
+    .tab-btn.active {
+      background: linear-gradient(180deg, var(--accent-bright) 0%, var(--accent) 100%);
+      color: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 2px 12px rgba(165,0,52,0.45);
+    }
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── Cards ────────────────────────────────────── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .card h3 { margin: 0 0 14px 0; font-size: 15px; color: var(--text); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+
+    /* ── Buttons ──────────────────────────────────── */
+    button.primary {
+      position: relative; overflow: hidden;
+      border: 2px solid rgba(165,0,52,0.6);
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--accent-bright) 0%, var(--accent) 100%);
+      color: #fff;
+      padding: 9px 18px;
+      font-weight: 700; font-size: 13px; letter-spacing: 0.3px;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(165,0,52,0.35);
+      transition: filter 0.1s ease, transform 0.08s ease;
+    }
+    button.primary:hover { filter: brightness(1.1); }
+    button.primary:active { transform: translateY(1px); filter: brightness(0.92); }
+    button.secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    button.secondary:hover { border-color: var(--accent); color: var(--text); }
+    button.danger {
+      background: rgba(255,107,107,0.12);
+      border: 1px solid rgba(255,107,107,0.35);
+      color: var(--err-color);
+      padding: 8px 14px; border-radius: 6px; font-size: 13px;
+      cursor: pointer; transition: all 0.12s;
+    }
+    button.danger:hover { background: rgba(255,107,107,0.22); }
+    button.icon-btn {
+      background: var(--remote-btn);
+      border: 1px solid var(--remote-btn-border);
+      color: var(--text);
+      padding: 0;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.12s, border-color 0.12s, transform 0.08s;
+      user-select: none;
+    }
+    button.icon-btn:hover { background: var(--remote-btn-hover); border-color: var(--accent); }
+    button.icon-btn:active { transform: scale(0.93); }
+
+    /* ── Theme / action buttons ───────────────────── */
+    #themeToggleBtn, #settingsBtn, #refreshBtn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 999px;
+      cursor: pointer; font-size: 13px;
+      transition: background 0.15s;
+    }
+    #themeToggleBtn:hover, #settingsBtn:hover, #refreshBtn:hover {
+      background: rgba(165,0,52,0.1);
+    }
+
+    /* ── Form elements ────────────────────────────── */
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    input, select, textarea {
+      width: 100%; padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--input-color);
+      font-family: inherit; font-size: 14px;
+      margin-bottom: 10px;
+      transition: border-color 0.15s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none; border-color: var(--accent);
+    }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+    .row > * { flex: 1; min-width: 140px; }
+
+    /* ── Volume slider ────────────────────────────── */
+    .vol-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .vol-wrap input[type=range] {
+      flex: 1; margin: 0;
+      -webkit-appearance: none;
+      height: 6px;
+      border-radius: 4px;
+      background: var(--vol-track);
+      border: none;
+      cursor: pointer;
+    }
+    .vol-wrap input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      box-shadow: 0 0 6px rgba(165,0,52,0.5);
+      cursor: pointer;
+    }
+    .vol-val { font-size: 13px; color: var(--muted); min-width: 32px; text-align: right; }
+
+    /* ── Remote control ───────────────────────────── */
+    .remote-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 20px;
+    }
+    .dpad-ring {
+      position: relative;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
+    }
+    .dpad-btn {
+      position: absolute;
+      background: var(--remote-btn);
+      border: 1px solid var(--remote-btn-border);
+      color: var(--text);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      transition: background 0.1s, transform 0.08s;
+      user-select: none;
+    }
+    .dpad-btn:hover { background: var(--remote-btn-hover); }
+    .dpad-btn:active { transform: scale(0.9); }
+    .dpad-up    { top: 6px;   left: 50%; transform: translateX(-50%); width: 44px; height: 44px; border-radius: 8px 8px 4px 4px; }
+    .dpad-down  { bottom: 6px; left: 50%; transform: translateX(-50%); width: 44px; height: 44px; border-radius: 4px 4px 8px 8px; }
+    .dpad-left  { left: 6px;  top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 8px 4px 4px 8px; }
+    .dpad-right { right: 6px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 4px 8px 8px 4px; }
+    .dpad-up:active    { transform: translateX(-50%) scale(0.9); }
+    .dpad-down:active  { transform: translateX(-50%) scale(0.9); }
+    .dpad-left:active  { transform: translateY(-50%) scale(0.9); }
+    .dpad-right:active { transform: translateY(-50%) scale(0.9); }
+    .dpad-ok {
+      position: absolute;
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      border: none;
+      color: #fff;
+      font-weight: 700; font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(165,0,52,0.4);
+      transition: filter 0.1s, transform 0.08s;
+    }
+    .dpad-ok:hover { filter: brightness(1.1); }
+    .dpad-ok:active { transform: translate(-50%,-50%) scale(0.92); }
+    .remote-row { display: flex; gap: 10px; justify-content: center; }
+    .remote-btn-lg { width: 56px; height: 48px; font-size: 16px; border-radius: 10px; }
+    .remote-btn-sm { width: 44px; height: 40px; font-size: 14px; border-radius: 8px; }
+    .remote-label { font-size: 10px; color: var(--muted); text-align: center; margin-top: 2px; }
+
+    /* ── App launch grid ──────────────────────────── */
+    .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+    .app-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 14px 8px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--remote-btn);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px; font-weight: 600; text-align: center;
+      transition: all 0.12s;
+    }
+    .app-btn:hover { border-color: var(--accent); background: var(--remote-btn-hover); }
+    .app-btn:active { transform: scale(0.95); }
+    .app-icon { font-size: 26px; }
+
+    /* ── Input selector ───────────────────────────── */
+    .input-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+    .input-btn {
+      padding: 12px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--remote-btn);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 13px; font-weight: 600; text-align: center;
+      transition: all 0.12s;
+    }
+    .input-btn:hover { border-color: var(--accent); background: var(--remote-btn-hover); }
+    .input-btn.active { border-color: var(--accent); background: rgba(165,0,52,0.15); color: var(--accent-bright); }
+    .input-btn:active { transform: scale(0.96); }
+
+    /* ── Picture mode badges ──────────────────────── */
+    .mode-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .mode-btn {
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer; font-size: 13px; font-weight: 600;
+      transition: all 0.12s;
+    }
+    .mode-btn:hover { border-color: var(--accent); color: var(--text); }
+    .mode-btn.active { background: rgba(165,0,52,0.2); border-color: var(--accent); color: var(--accent-bright); }
+
+    /* ── Modal ────────────────────────────────────── */
+    .modal-bg {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.75);
+      z-index: 50;
+      align-items: flex-start; justify-content: center;
+      padding: 24px; overflow-y: auto;
+    }
+    .modal-bg.open { display: flex; }
+    .modal {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      max-width: 640px; width: 100%;
+      padding: 22px; margin-top: 20px;
+    }
+    .modal h3 { margin: 0 0 16px 0; }
+    .modal-close {
+      float: right; background: none; border: none;
+      color: var(--muted); font-size: 20px; cursor: pointer;
+      line-height: 1; padding: 0 4px;
+    }
+    .modal-close:hover { color: var(--err-color); }
+
+    /* ── Log ──────────────────────────────────────── */
+    pre.log {
+      font-size: 11px;
+      background: #060206;
+      padding: 12px; border-radius: 8px;
+      max-height: 360px; overflow: auto;
+      white-space: pre-wrap; word-break: break-word;
+      border: 1px solid var(--border);
+      font-family: "Courier New", monospace;
+    }
+    .log-info  { color: var(--text); }
+    .log-warn  { color: var(--warn); }
+    .log-error { color: var(--err-color); }
+
+    /* ── Toast ────────────────────────────────────── */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 100;
+      padding: 10px 18px; border-radius: 8px;
+      font-size: 13px; font-weight: 600;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      opacity: 0; transform: translateY(8px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+      max-width: 300px;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.ok   { background: #0e3028; border: 1px solid var(--ok); color: var(--ok); }
+    #toast.err  { background: #2e0810; border: 1px solid var(--err-color); color: var(--err-color); }
+    #toast.info { background: #2a1018; border: 1px solid var(--accent); color: var(--accent-bright); }
+
+    /* ── MAC address picker ───────────────────────── */
+    .mac-picker {
+      margin-top: 6px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(165,0,52,0.25);
+      background: rgba(165,0,52,0.06);
+      font-size: 12px;
+    }
+    .mac-picker-label { color: var(--muted); margin-bottom: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+    .mac-picker-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+    }
+    .mac-picker-row + .mac-picker-row { border-top: 1px solid var(--input-border); }
+    .mac-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(165,0,52,0.18);
+      color: var(--accent-bright);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .mac-badge.wired { background: rgba(80,130,200,0.2); color: #7eb8f7; }
+    .mac-picker-row code {
+      flex: 1;
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--text);
+      word-break: break-all;
+    }
+    .mac-use-btn {
+      padding: 3px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(165,0,52,0.4);
+      background: rgba(165,0,52,0.12);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .mac-use-btn:hover { background: rgba(165,0,52,0.28); color: var(--accent-bright); }
+
+    /* ── Label row (label + help button side by side) */
+    .label-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .label-row label { margin-bottom: 0; flex: 1; }
+
+    /* ── Help tooltip / expand box ───────────────── */
+    .help-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(165,0,52,0.12);
+      border: 1px solid rgba(165,0,52,0.3);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background 0.15s;
+      user-select: none;
+    }
+    .help-trigger:hover { background: rgba(165,0,52,0.28); color: var(--accent-bright); }
+    .help-trigger.active { background: rgba(165,0,52,0.3); color: var(--accent-bright); }
+    .help-box {
+      display: none;
+      margin-top: -4px;
+      margin-bottom: 10px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(165,0,52,0.25);
+      background: rgba(165,0,52,0.06);
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .help-box.open { display: block; }
+    .help-box ol { margin: 6px 0 6px 18px; padding: 0; }
+    .help-box li { margin-bottom: 4px; }
+    .help-box strong { color: var(--text); }
+    .help-box kbd {
+      display: inline-block;
+      padding: 1px 5px;
+      border-radius: 4px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--accent-bright);
+    }
+    .help-note {
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .help-note a { color: var(--accent); }
+    .help-note a:hover { color: var(--accent-bright); }
+
+    /* ── Misc ─────────────────────────────────────── */
+    .err  { color: var(--err-color); }
+    .ok   { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .muted { color: var(--muted); font-size: 13px; }
+    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+    .sep { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+    .section-title {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+    }
+    .power-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .power-status { font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div id="appHeader">
+    <div class="page-title" data-testid="app-title">
+      <span class="lg-logo">LG</span>
+      LG WebOS Smash Deck
+    </div>
+    <div class="header-actions">
+      <button id="refreshBtn" title="Refresh TV state" data-testid="refresh-btn">&#8635; Refresh</button>
+      <button id="settingsBtn" data-testid="settings-btn">&#9881; Settings</button>
+      <button id="themeToggleBtn">&#9788; Light</button>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <div id="appHero" class="theme-hero">
+    LG TV remote dashboard &mdash; control your Life's Good television via IP Control.
+    Configure your TV IP, MAC address and keycode in <strong>Settings</strong>.
+  </div>
+
+  <!-- Status Bar -->
+  <div id="statusBar">
+    <span class="status-item">
+      <span class="status-dot off" id="tvDot"></span>
+      <span id="tvStatusLabel">Checking&hellip;</span>
+    </span>
+    <span class="status-item muted" id="statusApp">App: &mdash;</span>
+    <span class="status-item muted" id="statusVol">Vol: &mdash;</span>
+    <span class="status-item muted" id="statusMute"></span>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="remote" data-testid="tab-remote">&#128246; Remote</button>
+    <button class="tab-btn" data-tab="apps" data-testid="tab-apps">&#128640; Apps</button>
+    <button class="tab-btn" data-tab="inputs" data-testid="tab-inputs">&#128268; Inputs</button>
+    <button class="tab-btn" data-tab="picture" data-testid="tab-picture">&#127916; Picture</button>
+    <button class="tab-btn" data-tab="power" data-testid="tab-power">&#9211; Power</button>
+  </div>
+
+  <!-- ── Remote Panel ─────────────────────────────── -->
+  <div class="panel active" id="panel-remote">
+    <div class="grid-2">
+
+      <!-- D-Pad + nav -->
+      <div class="card">
+        <h3>Navigation</h3>
+        <div class="remote-wrap">
+          <!-- D-Pad -->
+          <div class="dpad-ring">
+            <button class="dpad-btn dpad-up"    data-key="arrowup">&#9650;</button>
+            <button class="dpad-btn dpad-down"  data-key="arrowdown">&#9660;</button>
+            <button class="dpad-btn dpad-left"  data-key="arrowleft">&#9664;</button>
+            <button class="dpad-btn dpad-right" data-key="arrowright">&#9654;</button>
+            <button class="dpad-ok"             data-key="ok">OK</button>
+          </div>
+
+          <!-- Back / Home / Menu -->
+          <div class="remote-row" style="margin-top:10px;">
+            <div>
+              <button class="icon-btn remote-btn-lg" data-key="returnback" title="Back">&#8617;</button>
+              <div class="remote-label">Back</div>
+            </div>
+            <div>
+              <button class="icon-btn remote-btn-lg" data-key="myapp" title="Home">&#8962;</button>
+              <div class="remote-label">Home</div>
+            </div>
+            <div>
+              <button class="icon-btn remote-btn-lg" data-key="settingmenu" title="Menu">&#9776;</button>
+              <div class="remote-label">Menu</div>
+            </div>
+            <div>
+              <button class="icon-btn remote-btn-lg" data-key="programminfo" title="Info">&#8505;</button>
+              <div class="remote-label">Info</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Volume + Playback -->
+      <div class="card">
+        <h3>Volume</h3>
+        <div class="vol-wrap">
+          <button class="icon-btn remote-btn-sm" data-key="volumedown" title="Vol -">&#128265;</button>
+          <input type="range" id="volSlider" min="0" max="100" value="20" />
+          <button class="icon-btn remote-btn-sm" data-key="volumeup" title="Vol +">&#128266;</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <span class="muted">Level:</span>
+          <span id="volDisplay">—</span>
+          <span id="volSending" class="muted" style="display:none;font-size:11px;">setting…</span>
+          <button class="icon-btn remote-btn-sm" id="muteBtn" data-key="volumemute" title="Mute" style="margin-left:auto;">&#128264;</button>
+        </div>
+        <hr class="sep"/>
+        <h3 style="margin-top:4px;">Playback</h3>
+        <div class="remote-row">
+          <div>
+            <button class="icon-btn remote-btn-lg" data-key="rewind">&#9194;</button>
+            <div class="remote-label">Rewind</div>
+          </div>
+          <div>
+            <button class="icon-btn remote-btn-lg" data-key="play">&#9654;&#65038;</button>
+            <div class="remote-label">Play</div>
+          </div>
+          <div>
+            <button class="icon-btn remote-btn-lg" data-key="fastforward">&#9193;</button>
+            <div class="remote-label">FF</div>
+          </div>
+          <div>
+            <button class="icon-btn remote-btn-lg" data-key="record">&#9210;</button>
+            <div class="remote-label">Rec</div>
+          </div>
+        </div>
+
+        <hr class="sep"/>
+        <h3 style="margin-top:4px;">Channels</h3>
+        <div class="remote-row">
+          <div>
+            <button class="icon-btn remote-btn-lg" data-key="channelup">CH &#9650;</button>
+            <div class="remote-label">Ch Up</div>
+          </div>
+          <div>
+            <button class="icon-btn remote-btn-lg" data-key="channeldown">CH &#9660;</button>
+            <div class="remote-label">Ch Down</div>
+          </div>
+          <div>
+            <button class="icon-btn remote-btn-lg" data-key="livetv">&#128250;</button>
+            <div class="remote-label">Live TV</div>
+          </div>
+          <div>
+            <button class="icon-btn remote-btn-lg" data-key="programguide">&#128198;</button>
+            <div class="remote-label">Guide</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Number pad -->
+      <div class="card">
+        <h3>Number Pad</h3>
+        <div style="display:grid;grid-template-columns:repeat(3,56px);gap:8px;justify-content:center;">
+          <button class="icon-btn remote-btn-lg" data-key="number1">1</button>
+          <button class="icon-btn remote-btn-lg" data-key="number2">2</button>
+          <button class="icon-btn remote-btn-lg" data-key="number3">3</button>
+          <button class="icon-btn remote-btn-lg" data-key="number4">4</button>
+          <button class="icon-btn remote-btn-lg" data-key="number5">5</button>
+          <button class="icon-btn remote-btn-lg" data-key="number6">6</button>
+          <button class="icon-btn remote-btn-lg" data-key="number7">7</button>
+          <button class="icon-btn remote-btn-lg" data-key="number8">8</button>
+          <button class="icon-btn remote-btn-lg" data-key="number9">9</button>
+          <button class="icon-btn remote-btn-lg" data-key="previouschannel">Prev</button>
+          <button class="icon-btn remote-btn-lg" data-key="number0">0</button>
+          <button class="icon-btn remote-btn-lg" data-key="livetv">TV</button>
+        </div>
+      </div>
+
+      <!-- Color buttons -->
+      <div class="card">
+        <h3>Color Buttons &amp; More</h3>
+        <div class="remote-row" style="margin-bottom:12px;">
+          <div>
+            <button class="icon-btn remote-btn-lg" data-key="redbutton" style="background:#3a0010;border-color:#8b0022;color:#ff4060;">&#9632;</button>
+            <div class="remote-label">Red</div>
+          </div>
+          <div>
+            <button class="icon-btn remote-btn-lg" data-key="greenbutton" style="background:#003a10;border-color:#008840;color:#40ff80;">&#9632;</button>
+            <div class="remote-label">Green</div>
+          </div>
+          <div>
+            <button class="icon-btn remote-btn-lg" data-key="yellowbutton" style="background:#2a2000;border-color:#886000;color:#ffe040;">&#9632;</button>
+            <div class="remote-label">Yellow</div>
+          </div>
+          <div>
+            <button class="icon-btn remote-btn-lg" data-key="bluebutton" style="background:#00103a;border-color:#004088;color:#4080ff;">&#9632;</button>
+            <div class="remote-label">Blue</div>
+          </div>
+        </div>
+        <hr class="sep" />
+        <div class="remote-row">
+          <div>
+            <button class="icon-btn remote-btn-lg" data-key="captionsubtitle">CC</button>
+            <div class="remote-label">Subtitles</div>
+          </div>
+          <div>
+            <button class="icon-btn remote-btn-lg" data-key="aspectratio">&#9654;&#9650;</button>
+            <div class="remote-label">Aspect</div>
+          </div>
+          <div>
+            <button class="icon-btn remote-btn-lg" data-key="audiomode">&#127925;</button>
+            <div class="remote-label">Audio</div>
+          </div>
+          <div>
+            <button class="icon-btn remote-btn-lg" data-key="videomode">&#127909;</button>
+            <div class="remote-label">Video</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Apps Panel ──────────────────────────────── -->
+  <div class="panel" id="panel-apps">
+    <div class="card">
+      <h3>Launch App</h3>
+      <div class="app-grid">
+        <button class="app-btn" data-app="netflix"><span class="app-icon">🎬</span>Netflix</button>
+        <button class="app-btn" data-app="youtube.leanback.v4"><span class="app-icon">▶️</span>YouTube</button>
+        <button class="app-btn" data-app="amazon"><span class="app-icon">📦</span>Amazon</button>
+        <button class="app-btn" data-app="com.disney.disneyplus-prod"><span class="app-icon">✨</span>Disney+</button>
+        <button class="app-btn" data-app="com.hbo.hbomax"><span class="app-icon">🎭</span>Max</button>
+        <button class="app-btn" data-app="hulu"><span class="app-icon">📺</span>Hulu</button>
+        <button class="app-btn" data-app="cdp-30"><span class="app-icon">🟠</span>Plex</button>
+        <button class="app-btn" data-app="vudu"><span class="app-icon">🎥</span>Vudu</button>
+        <button class="app-btn" data-app="com.movenetworks.app.sling-tv-sling-production"><span class="app-icon">📡</span>Sling</button>
+        <button class="app-btn" data-app="com.webos.app.browser"><span class="app-icon">🌐</span>Browser</button>
+        <button class="app-btn" data-app="com.webos.app.photovideo"><span class="app-icon">🖼</span>Photos</button>
+        <button class="app-btn" data-app="com.webos.app.music"><span class="app-icon">🎵</span>Music</button>
+        <button class="app-btn" data-app="com.palm.app.settings"><span class="app-icon">⚙️</span>Settings</button>
+      </div>
+      <hr class="sep"/>
+      <div class="section-title">Custom App ID</div>
+      <div class="row">
+        <div>
+          <label>App ID</label>
+          <input type="text" id="customAppId" placeholder="e.g. com.example.app" />
+        </div>
+        <div style="flex:0;">
+          <label>&nbsp;</label>
+          <button class="primary" id="launchCustomApp">Launch</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Inputs Panel ────────────────────────────── -->
+  <div class="panel" id="panel-inputs">
+    <div class="card">
+      <h3>Input Source</h3>
+      <div class="input-grid">
+        <button class="input-btn" data-input="hdmi1">HDMI 1</button>
+        <button class="input-btn" data-input="hdmi2">HDMI 2</button>
+        <button class="input-btn" data-input="hdmi3">HDMI 3</button>
+        <button class="input-btn" data-input="hdmi4">HDMI 4</button>
+        <button class="input-btn" data-input="avav1">AV</button>
+        <button class="input-btn" data-input="component1">Component</button>
+        <button class="input-btn" data-input="dtv">DTV</button>
+        <button class="input-btn" data-input="atv">ATV</button>
+        <button class="input-btn" data-input="cadtv">CADTV</button>
+        <button class="input-btn" data-input="catv">CATV</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Picture Panel ───────────────────────────── -->
+  <div class="panel" id="panel-picture">
+    <div class="card">
+      <h3>Picture Mode</h3>
+      <div class="mode-grid" id="pictureModes">
+        <button class="mode-btn" data-mode="cinema">Cinema</button>
+        <button class="mode-btn" data-mode="eco">Eco</button>
+        <button class="mode-btn" data-mode="filmMaker">Film Maker</button>
+        <button class="mode-btn" data-mode="game">Game</button>
+        <button class="mode-btn" data-mode="normal">Normal</button>
+        <button class="mode-btn" data-mode="sports">Sports</button>
+        <button class="mode-btn" data-mode="vivid">Vivid</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Screen Mute</h3>
+      <div class="mode-grid">
+        <button class="mode-btn" data-screenmute="screenmuteon">Screen Off</button>
+        <button class="mode-btn" data-screenmute="videomuteon">Video Off</button>
+        <button class="mode-btn" data-screenmute="allmuteoff">All On</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Energy Saving</h3>
+      <div class="mode-grid">
+        <button class="mode-btn" data-energy="off">Off</button>
+        <button class="mode-btn" data-energy="minimum">Minimum</button>
+        <button class="mode-btn" data-energy="medium">Medium</button>
+        <button class="mode-btn" data-energy="maximum">Maximum</button>
+        <button class="mode-btn" data-energy="auto">Auto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Power Panel ─────────────────────────────── -->
+  <div class="panel" id="panel-power">
+    <div class="card">
+      <h3>Power Control</h3>
+      <p class="muted" style="margin-top:0;">
+        Power On uses Wake-on-LAN (requires TV MAC address configured in Settings).
+        Power Off sends a direct IP command.
+      </p>
+      <div class="power-row">
+        <button class="primary" id="powerOnBtn" style="font-size:15px;padding:12px 28px;">&#9211; Power On (WoL)</button>
+        <button class="danger" id="powerOffBtn" style="font-size:15px;padding:12px 28px;">&#9210; Power Off</button>
+      </div>
+      <hr class="sep"/>
+      <div id="powerStatus" class="muted"></div>
+    </div>
+  </div>
+
+  <!-- ── Settings Modal ─────────────────────────── -->
+  <div class="modal-bg" id="settingsModal" data-testid="settings-modal">
+    <div class="modal">
+      <button class="modal-close" id="closeSettings">&times;</button>
+      <h3>&#9881; Settings</h3>
+      <div class="row">
+        <div>
+          <label>TV IP Address</label>
+          <input type="text" id="setTVIP" placeholder="192.168.1.x" />
+        </div>
+        <div>
+          <label>Port (server)</label>
+          <input type="text" id="setPort" placeholder="8088" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="label-row">
+            <label for="setTVMac">TV MAC Address (for Wake-on-LAN)</label>
+            <button type="button" id="fetchMacBtn" class="help-trigger" aria-label="Fetch MAC address from TV" title="Ask the TV for its MAC addresses">&#8593; Fetch from TV</button>
+          </div>
+          <input type="text" id="setTVMac" placeholder="aa:bb:cc:dd:ee:ff" />
+          <!-- MAC picker appears after a successful fetch -->
+          <div class="mac-picker" id="macPicker" style="display:none;">
+            <div class="mac-picker-label">Choose which MAC to use:</div>
+            <div class="mac-picker-row" id="macPickerWifi" style="display:none;">
+              <span class="mac-badge">Wi-Fi</span>
+              <code id="macWifiVal"></code>
+              <button type="button" class="mac-use-btn" data-mac-type="wifi">Use</button>
+            </div>
+            <div class="mac-picker-row" id="macPickerWired" style="display:none;">
+              <span class="mac-badge wired">Wired</span>
+              <code id="macWiredVal"></code>
+              <button type="button" class="mac-use-btn" data-mac-type="wired">Use</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="label-row">
+            <label for="setKeycode">Network IP Control Keycode</label>
+            <button type="button" class="help-trigger" data-help="keycode-help" aria-label="How to get the keycode">&#9432; How?</button>
+          </div>
+          <input type="text" id="setKeycode" placeholder="XXXXXXXX" maxlength="8" />
+          <div class="help-box" id="keycode-help">
+            <strong>How to enable IP Control &amp; generate the keycode:</strong>
+            <ol>
+              <li>On the TV remote press <kbd>Settings</kbd> → All Settings.</li>
+              <li>Navigate focus to <strong>Connection</strong> (or <strong>Network</strong>) — do <em>not</em> press OK yet.</li>
+              <li>Quickly press <kbd>8</kbd><kbd>2</kbd><kbd>8</kbd><kbd>8</kbd><kbd>8</kbd> on the remote.</li>
+              <li>The hidden <strong>Network IP Control</strong> menu appears.</li>
+              <li>Enable <strong>Network IP Control</strong> if it is off.</li>
+              <li>Select <strong>Generate Keycode</strong> — note the 8-character code shown on screen.</li>
+              <li>Optionally enable <strong>Wake on LAN</strong> so the TV can be powered on remotely.</li>
+              <li>A new keycode can be generated at any time — the old one is immediately invalidated.</li>
+            </ol>
+            <div class="help-note">
+              Source: <a href="https://github.com/WesSouza/lgtv-ip-control#tv-setup" target="_blank" rel="noopener">WesSouza/lgtv-ip-control — TV Setup</a>
+              &amp; LG IP Control Implementation Guide (v0.8, 2018)
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="label-row">
+            <label for="setMaxVolume">Max Volume (TV scale 1–100)</label>
+          </div>
+          <input type="number" id="setMaxVolume" min="1" max="100" placeholder="100"
+                 style="width:100px;" />
+          <div class="muted" style="font-size:11px;margin-top:4px;">
+            Caps the slider so your external audio device never clips.
+            Leave blank or 100 for no limit.
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-bottom:14px;">
+        <button class="primary" id="saveSettings">Save Settings</button>
+        <button class="secondary" id="testConnection">Test Connection</button>
+      </div>
+      <div id="settingsMsg" class="muted" style="margin-bottom:10px;"></div>
+      <hr class="sep"/>
+      <div class="toolbar">
+        <div class="section-title" style="margin:0;">Activity Log</div>
+        <button class="secondary" id="refreshLogs" style="margin-left:auto;">Refresh</button>
+      </div>
+      <pre class="log" id="logOutput">Loading logs…</pre>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+<script>
+  // ── State ──────────────────────────────────────────────────────────────────
+  const state = {
+    tvReachable: false,
+    currentApp: null,
+    volume: null,
+    muted: false,
+    theme: localStorage.getItem('lgdeck-theme') || 'dark',
+  };
+
+  // Volume slider drag guard — prevents the poll from snapping the slider
+  // back to the TV's current value while the user is mid-drag.
+  let volIsDragging = false;
+
+  // ── Theme ──────────────────────────────────────────────────────────────────
+  function applyTheme() {
+    if (state.theme === 'light') {
+      document.body.classList.add('light');
+      document.getElementById('themeToggleBtn').textContent = '🌙 Dark';
+    } else {
+      document.body.classList.remove('light');
+      document.getElementById('themeToggleBtn').textContent = '☀ Light';
+    }
+  }
+  applyTheme();
+  document.getElementById('themeToggleBtn').addEventListener('click', () => {
+    state.theme = state.theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('lgdeck-theme', state.theme);
+    applyTheme();
+  });
+
+  // ── Tabs ───────────────────────────────────────────────────────────────────
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ── Toast ──────────────────────────────────────────────────────────────────
+  let toastTimer;
+  function showToast(msg, type = 'info', ms = 2500) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'show ' + type;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.classList.remove('show'); }, ms);
+  }
+
+  // ── API helpers ────────────────────────────────────────────────────────────
+  async function api(path, method = 'GET', body = null, signal = null) {
+    const opts = { method, headers: { 'Content-Type': 'application/json' } };
+    if (body) opts.body = JSON.stringify(body);
+    if (signal) opts.signal = signal;
+    try {
+      const r = await fetch(path, opts);
+      return await r.json();
+    } catch (e) {
+      // Re-throw AbortError so callers can distinguish cancellation from failure.
+      if (e && e.name === 'AbortError') throw e;
+      console.error('[lgdeck] api error', path, e);
+      return { success: false, error: e.message };
+    }
+  }
+
+  // ── Status refresh ─────────────────────────────────────────────────────────
+  async function refreshState() {
+    const res = await api('/api/state');
+    const dot = document.getElementById('tvDot');
+    const label = document.getElementById('tvStatusLabel');
+
+    if (res.success && res.data) {
+      const d = res.data;
+      state.tvReachable = d.reachable;
+      state.currentApp = d.app;
+      state.volume = d.volume;
+      state.muted = d.muted;
+
+      dot.className = 'status-dot ' + (d.reachable ? 'on' : 'off');
+      label.textContent = d.reachable ? 'TV Online' : (d.error || 'TV Offline');
+      document.getElementById('statusApp').textContent = 'App: ' + (d.app || '—');
+      document.getElementById('statusVol').textContent = 'Vol: ' + (d.volume != null ? d.volume : '—');
+      document.getElementById('statusMute').textContent = d.muted ? '🔇 Muted' : '';
+
+      if (d.volume != null) {
+        // Don't snap the slider back while the user is mid-drag or a send is in-flight
+        if (!volIsDragging && !volDebounceTimer) {
+          document.getElementById('volSlider').value = d.volume;
+          document.getElementById('volDisplay').textContent = d.volume;
+        }
+      }
+    } else {
+      dot.className = 'status-dot off';
+      label.textContent = 'Not configured';
+    }
+    console.debug('[lgdeck] state refreshed', res.data);
+  }
+
+  document.getElementById('refreshBtn').addEventListener('click', refreshState);
+
+  // ── Key actions ────────────────────────────────────────────────────────────
+  document.querySelectorAll('[data-key]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const key = btn.dataset.key;
+      console.log('[lgdeck] key action', key);
+      const res = await api('/api/key', 'POST', { key });
+      if (res.success) {
+        showToast('Key: ' + key, 'ok');
+        // After vol ± keys, refresh display to reflect new TV volume
+        if (key === 'volumeup' || key === 'volumedown' || key === 'volumemute') {
+          setTimeout(async () => {
+            if (volIsDragging) return;
+            const vres = await api('/api/volume');
+            if (vres.success && vres.data != null) {
+              const v = vres.data.level;
+              document.getElementById('volSlider').value = v;
+              document.getElementById('volDisplay').textContent = v;
+              document.getElementById('statusVol').textContent = 'Vol: ' + v;
+            }
+          }, 500);
+        }
+      } else {
+        showToast(res.error || 'Key failed', 'err');
+      }
+    });
+  });
+
+  // ── Volume slider ──────────────────────────────────────────────────────────
+  let volDebounceTimer = null;
+
+  // AbortController for the in-flight volume stream — replaced on every new
+  // slider release so the backend loop stops and a fresh one starts.
+  let volAbortController = null;
+
+  async function sendVolume(level) {
+    console.log('[lgdeck] set volume requested:', level);
+
+    // Abort any previous stream; the backend detects the closed connection
+    // and stops pressing keys immediately.
+    if (volAbortController) {
+      volAbortController.abort();
+    }
+    volAbortController = new AbortController();
+    const signal = volAbortController.signal;
+
+    const sending  = document.getElementById('volSending');
+    const volDisp  = document.getElementById('volDisplay');
+    const statusVol = document.getElementById('statusVol');
+    sending.style.display = 'inline';
+
+    let response;
+    try {
+      response = await fetch('/api/volume/stream', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ level }),
+        signal
+      });
+    } catch (e) {
+      sending.style.display = 'none';
+      if (e.name !== 'AbortError') showToast('Volume request failed', 'err');
+      return;
+    }
+
+    // Read the SSE stream — each "data:" line carries the live TV volume.
+    const reader  = response.body.getReader();
+    const decoder = new TextDecoder();
+    let   buf     = '';
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split('\n');
+        buf = lines.pop(); // keep any partial last line for next chunk
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          let evt;
+          try { evt = JSON.parse(line.slice(6)); } catch { continue; }
+
+          console.log('[lgdeck] volume step:', evt.level, evt.done ? '(done)' : '');
+
+          // Update slider only when the user isn't actively dragging.
+          if (!volIsDragging) {
+            document.getElementById('volSlider').value = evt.level;
+          }
+          volDisp.textContent   = evt.level;
+          statusVol.textContent = 'Vol: ' + evt.level;
+
+          if (evt.done) {
+            showToast('Volume → ' + evt.level, 'ok');
+          }
+        }
+      }
+    } catch (e) {
+      if (e.name !== 'AbortError') showToast('Volume stream error', 'err');
+    } finally {
+      sending.style.display = 'none';
+      volAbortController = null;
+    }
+  }
+
+  const volSlider = document.getElementById('volSlider');
+
+  // input fires on every increment while dragging — debounce 400ms
+  volSlider.addEventListener('input', () => {
+    volIsDragging = true;
+    const v = parseInt(volSlider.value, 10);
+    document.getElementById('volDisplay').textContent = v;
+    clearTimeout(volDebounceTimer);
+    volDebounceTimer = setTimeout(() => {
+      volIsDragging = false;
+      volDebounceTimer = null;
+      sendVolume(v);
+    }, 400);
+  });
+
+  // pointerup / mouseup: belt-and-suspenders — cancel debounce and fire immediately
+  function onVolRelease() {
+    if (!volIsDragging) return;
+    clearTimeout(volDebounceTimer);
+    volIsDragging = false;
+    sendVolume(parseInt(volSlider.value, 10));
+  }
+  volSlider.addEventListener('pointerup', onVolRelease);
+  volSlider.addEventListener('mouseup',   onVolRelease);
+
+  // ── Apps ───────────────────────────────────────────────────────────────────
+  document.querySelectorAll('[data-app]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const app = btn.dataset.app;
+      console.debug('[lgdeck] launch app', app);
+      const res = await api('/api/app', 'POST', { app });
+      if (res.success) {
+        showToast('Launched: ' + btn.textContent.trim(), 'ok');
+      } else {
+        showToast(res.error || 'Launch failed', 'err');
+      }
+    });
+  });
+
+  document.getElementById('launchCustomApp').addEventListener('click', async () => {
+    const app = document.getElementById('customAppId').value.trim();
+    if (!app) { showToast('Enter an App ID', 'err'); return; }
+    const res = await api('/api/app', 'POST', { app });
+    if (res.success) {
+      showToast('Launched: ' + app, 'ok');
+    } else {
+      showToast(res.error || 'Launch failed', 'err');
+    }
+  });
+
+  // ── Inputs ─────────────────────────────────────────────────────────────────
+  document.querySelectorAll('[data-input]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const input = btn.dataset.input;
+      const res = await api('/api/input', 'POST', { input });
+      if (res.success) {
+        document.querySelectorAll('[data-input]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        showToast('Input: ' + btn.textContent.trim(), 'ok');
+      } else {
+        showToast(res.error || 'Input failed', 'err');
+      }
+    });
+  });
+
+  // ── Picture modes ──────────────────────────────────────────────────────────
+  document.querySelectorAll('[data-mode]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const mode = btn.dataset.mode;
+      const res = await api('/api/picture', 'POST', { mode });
+      if (res.success) {
+        document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        showToast('Picture: ' + mode, 'ok');
+      } else {
+        showToast(res.error || 'Picture mode failed', 'err');
+      }
+    });
+  });
+
+  // ── Screen mute ────────────────────────────────────────────────────────────
+  document.querySelectorAll('[data-screenmute]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const mode = btn.dataset.screenmute;
+      const res = await api('/api/screenmute', 'POST', { mode });
+      if (res.success) {
+        showToast('Screen: ' + mode, 'ok');
+      } else {
+        showToast(res.error || 'Screen mute failed', 'err');
+      }
+    });
+  });
+
+  // ── Energy saving ──────────────────────────────────────────────────────────
+  document.querySelectorAll('[data-energy]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const level = btn.dataset.energy;
+      const res = await api('/api/energy', 'POST', { level });
+      if (res.success) {
+        showToast('Energy: ' + level, 'ok');
+      } else {
+        showToast(res.error || 'Energy saving failed', 'err');
+      }
+    });
+  });
+
+  // ── Power ──────────────────────────────────────────────────────────────────
+  document.getElementById('powerOnBtn').addEventListener('click', async () => {
+    const res = await api('/api/power', 'POST', { state: 'on' });
+    const el = document.getElementById('powerStatus');
+    if (res.success) {
+      el.innerHTML = '<span class="ok">&#10003; WoL packet sent. TV should power on shortly.</span>';
+      showToast('WoL sent!', 'ok');
+    } else {
+      el.innerHTML = '<span class="err">&#10007; ' + (res.error || 'WoL failed') + '</span>';
+      showToast(res.error || 'WoL failed', 'err');
+    }
+  });
+
+  document.getElementById('powerOffBtn').addEventListener('click', async () => {
+    const el = document.getElementById('powerStatus');
+    if (!confirm('Power off the TV?')) return;
+    const res = await api('/api/power', 'POST', { state: 'off' });
+    if (res.success) {
+      el.innerHTML = '<span class="ok">&#10003; TV powered off.</span>';
+      showToast('TV off', 'ok');
+      setTimeout(refreshState, 2000);
+    } else {
+      el.innerHTML = '<span class="err">&#10007; ' + (res.error || 'Power off failed') + '</span>';
+      showToast(res.error || 'Power off failed', 'err');
+    }
+  });
+
+  // ── Settings modal ─────────────────────────────────────────────────────────
+  // Applies max_volume from settings to the slider immediately.
+  function applyMaxVolume(maxVol) {
+    const cap = (maxVol && maxVol > 0 && maxVol <= 100) ? maxVol : 100;
+    const slider = document.getElementById('volSlider');
+    slider.max = cap;
+    // Clamp current value if it exceeds the new cap.
+    if (parseInt(slider.value, 10) > cap) slider.value = cap;
+    console.log('[lgdeck] max volume cap:', cap);
+  }
+
+  async function openSettings() {
+    const res = await api('/api/settings');
+    if (res.success && res.data) {
+      document.getElementById('setTVIP').value    = res.data.tv_ip  || '';
+      document.getElementById('setPort').value    = res.data.port   || '';
+      document.getElementById('setTVMac').value   = res.data.tv_mac || '';
+      document.getElementById('setKeycode').value = res.data.keycode || '';
+      const mv = res.data.max_volume;
+      document.getElementById('setMaxVolume').value = (mv && mv < 100) ? mv : '';
+    }
+    await loadLogs();
+    document.getElementById('settingsModal').classList.add('open');
+  }
+
+  document.getElementById('settingsBtn').addEventListener('click', openSettings);
+  document.getElementById('closeSettings').addEventListener('click', () => {
+    document.getElementById('settingsModal').classList.remove('open');
+  });
+  document.getElementById('settingsModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('settingsModal')) {
+      document.getElementById('settingsModal').classList.remove('open');
+    }
+  });
+
+  document.getElementById('saveSettings').addEventListener('click', async () => {
+    const mvRaw = parseInt(document.getElementById('setMaxVolume').value, 10);
+    const body = {
+      tv_ip:      document.getElementById('setTVIP').value.trim(),
+      port:       document.getElementById('setPort').value.trim(),
+      tv_mac:     document.getElementById('setTVMac').value.trim(),
+      keycode:    document.getElementById('setKeycode').value.trim(),
+      max_volume: (mvRaw > 0 && mvRaw <= 100) ? mvRaw : 100,
+    };
+    const res = await api('/api/settings', 'POST', body);
+    const msg = document.getElementById('settingsMsg');
+    if (res.success) {
+      msg.innerHTML = '<span class="ok">&#10003; Saved.</span>';
+      showToast('Settings saved', 'ok');
+      applyMaxVolume(body.max_volume);
+      setTimeout(refreshState, 500);
+    } else {
+      msg.innerHTML = '<span class="err">&#10007; ' + (res.error || 'Save failed') + '</span>';
+    }
+  });
+
+  document.getElementById('testConnection').addEventListener('click', async () => {
+    const msg = document.getElementById('settingsMsg');
+    msg.innerHTML = '<span class="muted">Testing&hellip;</span>';
+    const res = await api('/api/settings', 'PUT');
+    if (res.success && res.data) {
+      const s = res.data.status;
+      if (s === 'reachable') {
+        msg.innerHTML = '<span class="ok">&#10003; TV is reachable!</span>';
+      } else {
+        msg.innerHTML = '<span class="warn">&#9888; ' + s + '</span>';
+      }
+    } else {
+      msg.innerHTML = '<span class="err">&#10007; ' + (res.error || 'Test failed') + '</span>';
+    }
+  });
+
+  // ── Logs ───────────────────────────────────────────────────────────────────
+  async function loadLogs() {
+    const res = await api('/api/logs?lines=150');
+    const pre = document.getElementById('logOutput');
+    if (res.success && res.data && res.data.lines) {
+      const lines = res.data.lines;
+      if (!lines.length) { pre.textContent = '(no log entries yet)'; return; }
+      pre.innerHTML = lines.map(l => {
+        if (l.includes('[ERROR]')) return '<span class="log-error">' + escHtml(l) + '</span>';
+        if (l.includes('[WARN]'))  return '<span class="log-warn">' + escHtml(l) + '</span>';
+        return '<span class="log-info">' + escHtml(l) + '</span>';
+      }).join('\n');
+      pre.scrollTop = pre.scrollHeight;
+    } else {
+      pre.textContent = '(no logs)';
+    }
+  }
+  document.getElementById('refreshLogs').addEventListener('click', loadLogs);
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── MAC address fetch ─────────────────────────────────────────────────────
+  document.getElementById('fetchMacBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('fetchMacBtn');
+    const picker = document.getElementById('macPicker');
+    const origText = btn.textContent;
+    btn.textContent = 'Fetching…';
+    btn.disabled = true;
+
+    const res = await api('/api/macaddress');
+
+    btn.textContent = origText;
+    btn.disabled = false;
+
+    if (!res.success || (!res.data.wifi && !res.data.wired)) {
+      showToast(res.error || 'Could not fetch MAC from TV', 'err');
+      picker.style.display = 'none';
+      return;
+    }
+
+    const wifiRow  = document.getElementById('macPickerWifi');
+    const wiredRow = document.getElementById('macPickerWired');
+
+    if (res.data.wifi) {
+      document.getElementById('macWifiVal').textContent = res.data.wifi;
+      wifiRow.style.display = 'flex';
+    } else {
+      wifiRow.style.display = 'none';
+    }
+    if (res.data.wired) {
+      document.getElementById('macWiredVal').textContent = res.data.wired;
+      wiredRow.style.display = 'flex';
+    } else {
+      wiredRow.style.display = 'none';
+    }
+
+    picker.style.display = 'block';
+    console.debug('[lgdeck] mac addresses fetched', res.data);
+  });
+
+  document.getElementById('macPicker').addEventListener('click', async (e) => {
+    const useBtn = e.target.closest('.mac-use-btn');
+    if (!useBtn) return;
+    const macType = useBtn.dataset.macType;
+    const macVal  = document.getElementById('mac' + macType.charAt(0).toUpperCase() + macType.slice(1) + 'Val').textContent;
+
+    // Fill the input
+    document.getElementById('setTVMac').value = macVal;
+
+    // Auto-save to settings via ?save= param
+    const saveRes = await api('/api/macaddress?save=' + macType);
+    if (saveRes.success && saveRes.data.saved) {
+      showToast('MAC saved: ' + macVal, 'ok');
+    } else {
+      showToast('MAC filled — click Save Settings to persist', 'info');
+    }
+
+    // Collapse picker
+    document.getElementById('macPicker').style.display = 'none';
+    console.debug('[lgdeck] mac selected', macType, macVal);
+  });
+
+  // ── Help expand toggles ────────────────────────────────────────────────────
+  document.querySelectorAll('.help-trigger').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const targetId = btn.dataset.help;
+      const box = document.getElementById(targetId);
+      if (!box) return;
+      const isOpen = box.classList.toggle('open');
+      btn.classList.toggle('active', isOpen);
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+  });
+
+  // ── Boot ───────────────────────────────────────────────────────────────────
+  // Load settings first so the slider gets the correct max cap immediately,
+  // then do the first state refresh which populates the current volume.
+  (async () => {
+    const res = await api('/api/settings');
+    if (res.success && res.data) applyMaxVolume(res.data.max_volume);
+  })();
+  refreshState();
+  setInterval(refreshState, 15000);
+</script>
+</body>
+</html>

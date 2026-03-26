@@ -1,0 +1,11 @@
+{
+  "name": "lg-webos-smash-deck-e2e",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:demo": "playwright test demo-gif"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0"
+  }
+}
