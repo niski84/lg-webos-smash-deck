@@ -104,6 +104,15 @@ scripts/             # verify_api.sh, reload.sh, generate-demo-gif.sh
 
 [MIT](LICENSE)
 
+## Publishing the repo (GitHub)
+
+After cloning locally, create a **public** repository on GitHub (empty, no README), then:
+
+```bash
+git remote add origin https://github.com/YOUR_USER/lg-webos-smash-deck.git
+git push -u origin main
+```
+
 ## Acknowledgements
 
 Protocol behavior aligns with community implementations such as [lgtv-ip-control](https://github.com/WesSouza/lgtv-ip-control) and LG’s IP Control documentation.
