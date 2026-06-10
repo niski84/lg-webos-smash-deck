@@ -118,6 +118,7 @@ func (s *HTTPServer) Routes(webFS fs.FS) http.Handler {
 
 // ── Handlers ─────────────────────────────────────────────────────────────────
 
+// handleHealth reports service status and whether a TV is configured.
 func (s *HTTPServer) handleHealth(w http.ResponseWriter, r *http.Request) {
 	if !methodOnly(w, r, http.MethodGet) {
 		return
@@ -130,6 +131,7 @@ func (s *HTTPServer) handleHealth(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// handleSettings reads, updates, or tests the TV connection settings.
 func (s *HTTPServer) handleSettings(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
@@ -201,6 +203,7 @@ func (s *HTTPServer) handleSettings(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// handleState returns the TV's current power, volume, and input state.
 func (s *HTTPServer) handleState(w http.ResponseWriter, r *http.Request) {
 	if !methodOnly(w, r, http.MethodGet) {
 		return
@@ -218,6 +221,7 @@ func (s *HTTPServer) handleState(w http.ResponseWriter, r *http.Request) {
 	ok(w, state)
 }
 
+// handlePower turns the TV on via Wake-on-LAN or powers it off.
 func (s *HTTPServer) handlePower(w http.ResponseWriter, r *http.Request) {
 	if !methodOnly(w, r, http.MethodPost) {
 		return
@@ -262,6 +266,7 @@ func (s *HTTPServer) handlePower(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// handleVolume gets the current volume or sets it to a target level.
 func (s *HTTPServer) handleVolume(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
@@ -463,6 +468,7 @@ func (s *HTTPServer) handleVolumeStream(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
+// handleMute mutes or unmutes the TV audio.
 func (s *HTTPServer) handleMute(w http.ResponseWriter, r *http.Request) {
 	if !methodOnly(w, r, http.MethodPost) {
 		return
@@ -536,6 +542,7 @@ func (s *HTTPServer) handleInput(w http.ResponseWriter, r *http.Request) {
 	ok(w, map[string]string{"input": body.Input})
 }
 
+// handleApp launches the named app on the TV.
 func (s *HTTPServer) handleApp(w http.ResponseWriter, r *http.Request) {
 	if !methodOnly(w, r, http.MethodPost) {
 		return
@@ -560,6 +567,7 @@ func (s *HTTPServer) handleApp(w http.ResponseWriter, r *http.Request) {
 	ok(w, map[string]string{"app": body.App})
 }
 
+// handlePicture sets the TV's picture mode (e.g. cinema, vivid).
 func (s *HTTPServer) handlePicture(w http.ResponseWriter, r *http.Request) {
 	if !methodOnly(w, r, http.MethodPost) {
 		return
@@ -584,6 +592,7 @@ func (s *HTTPServer) handlePicture(w http.ResponseWriter, r *http.Request) {
 	ok(w, map[string]string{"mode": body.Mode})
 }
 
+// handleEnergy sets the TV's energy-saving level.
 func (s *HTTPServer) handleEnergy(w http.ResponseWriter, r *http.Request) {
 	if !methodOnly(w, r, http.MethodPost) {
 		return
@@ -608,6 +617,7 @@ func (s *HTTPServer) handleEnergy(w http.ResponseWriter, r *http.Request) {
 	ok(w, map[string]string{"level": body.Level})
 }
 
+// handleScreenMute blanks the TV screen or audio-only mode on or off.
 func (s *HTTPServer) handleScreenMute(w http.ResponseWriter, r *http.Request) {
 	if !methodOnly(w, r, http.MethodPost) {
 		return
@@ -632,6 +642,7 @@ func (s *HTTPServer) handleScreenMute(w http.ResponseWriter, r *http.Request) {
 	ok(w, map[string]string{"mode": body.Mode})
 }
 
+// handleMacAddress fetches the TV's wired and wifi MAC addresses, optionally saving one.
 func (s *HTTPServer) handleMacAddress(w http.ResponseWriter, r *http.Request) {
 	if !methodOnly(w, r, http.MethodGet) {
 		return
