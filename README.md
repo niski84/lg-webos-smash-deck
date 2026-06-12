@@ -5,117 +5,35 @@
 
 A small **Go** web app and REST API to control LG TVs over the network using LG’s **Network IP Control** protocol (TCP port 9761, AES when a keycode is configured). The UI is a single vanilla-JS dashboard styled with LG brand colors and dark/light themes.
 
-![Demo walkthrough](docs/demo.gif)
+Part of the [Smash Deck](https://github.com/niski84/smash-deck-catalog) family - self-hosted dashboards built in Go for the homelab.
 
-## Features
+## What It Does
 
-- **Remote**: D-pad, volume (slider uses sequential key presses for HDMI CEC / soundbars), playback, channels, color buttons, number pad  
-- **Apps**: Launch common streaming apps and custom app IDs  
-- **Inputs**: HDMI, AV, tuner sources  
-- **Picture**: Picture mode, screen mute, energy saving  
-- **Power**: Wake-on-LAN and IP power off  
-- **Settings**: TV IP, MAC (with fetch-from-TV), keycode, max volume cap, activity log  
+Speaks LG's Network IP Control protocol over TCP port 9761 (with AES encryption when an 8-character keycode is configured) to drive a TV without depending on the official mobile app. The dashboard exposes a full virtual remote: D-pad, volume slider (sequential key presses so HDMI CEC and soundbars track correctly), playback controls, channels, color buttons, and a number pad.
 
-Everything is available from the **CLI** (same binary), **REST JSON API**, and **web UI**.
+Beyond the remote it can launch streaming apps by ID, switch HDMI and tuner inputs, change picture mode, mute the screen, toggle energy saving, send Wake-on-LAN, and power the TV off. Every action is logged to a local activity log.
 
-## Requirements
+The same binary serves the web UI, a JSON REST API, and a CLI - useful for scripting or wiring the TV into other home automation.
 
-- **Go** 1.22+ (module uses 1.25)  
-- LG TV with **Network IP Control** enabled and an 8-character keycode (see Settings help in the app)  
-- Optional: **ffmpeg** to build the demo GIF from Playwright screenshots  
+## Tech Stack
 
-## Quick start
+- Go (single binary, no runtime dependencies)
+- `golang.org/x/crypto` for AES keycode encryption
+- Embedded vanilla HTML, CSS, and JavaScript (no framework)
 
-```bash
-git clone https://github.com/niski84/lg-webos-smash-deck.git
-cd lg-webos-smash-deck
-go run ./cmd/lgdeck
-```
-
-Open [http://localhost:8088](http://localhost:8088), open **Settings**, enter TV IP and keycode, then **Save**.
-
-### Environment
-
-| Variable    | Description        | Default   |
-|------------|--------------------|-----------|
-| `PORT`     | HTTP listen port   | `8088`    |
-| `TV_IP`    | TV address         | (from file) |
-| `TV_MAC`   | MAC for Wake-on-LAN | (optional) |
-| `TV_KEYCODE` | 8-char IP control key | (from file) |
-| `DATA_DIR` | Config + logs dir  | `./data`  |
-
-Settings are stored in `DATA_DIR/lgdeck-settings.json` (create `data/` or set `DATA_DIR`).
-
-### Build binary
+## Running
 
 ```bash
 go build -o lgdeck ./cmd/lgdeck
 ./lgdeck
 ```
 
-### API smoke test
+Configure via environment variables (`PORT`, `TV_IP`, `TV_MAC`, `TV_KEYCODE`, `DATA_DIR`) or through the Settings tab in the UI. Default port is 8088. Settings persist to `DATA_DIR/lgdeck-settings.json`.
 
-```bash
-./scripts/verify_api.sh
-```
+## Status
 
-## REST API (examples)
-
-Base URL: `http://localhost:8088` (adjust port as needed).
-
-- `GET /api/state` — reachability, app, volume, mute  
-- `GET /api/volume` — current volume  
-- `POST /api/volume` — set volume (body `{"level": N}`)  
-- `POST /api/volume/stream` — SSE stream while adjusting volume (slider)  
-- `POST /api/key` — `{"key": "volumeup"}`  
-- `POST /api/app` — `{"app": "netflix"}`  
-- `GET|POST /api/settings` — configuration  
-- See `internal/lgdeck/http_server.go` for the full route list  
-
-Responses use JSON with `success`, `data`, and `error` fields where applicable.
-
-## Demo GIF (Playwright)
-
-Captures each main screen (tabs + Settings) and builds `docs/demo.gif`.
-
-**Prerequisites:** Node.js, `ffmpeg` on `PATH`.
-
-```bash
-cd e2e && npm install && npx playwright install chromium
-cd .. && ./scripts/generate-demo-gif.sh
-```
-
-Or run the test only (frames land in `e2e/screenshots/frames/`):
-
-```bash
-cd e2e && npx playwright test demo-gif
-```
-
-The Playwright config starts the Go server on port **18765** by default (`LGDECK_E2E_PORT` overrides) so it does not clash with a dev server on `8088`.
-
-## Project layout
-
-```
-cmd/lgdeck/          # main entrypoint
-internal/lgdeck/     # TV client, crypto, HTTP API, config
-web/lgdeck/          # embedded static UI
-e2e/                 # Playwright tests + GIF pipeline
-scripts/             # verify_api.sh, reload.sh, generate-demo-gif.sh
-```
+Active development.
 
 ## License
 
-[MIT](LICENSE)
-
-## Publishing the repo (GitHub)
-
-After cloning locally, create a **public** repository on GitHub (empty, no README), then:
-
-```bash
-git remote add origin https://github.com/YOUR_USER/lg-webos-smash-deck.git
-git push -u origin main
-```
-
-## Acknowledgements
-
-Protocol behavior aligns with community implementations such as [lgtv-ip-control](https://github.com/WesSouza/lgtv-ip-control) and LG’s IP Control documentation.
+MIT
