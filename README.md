@@ -1,5 +1,8 @@
 # LG WebOS Smash Deck
 
+
+![Lg Webos Smash Deck demo](docs/lg-webos-smash-deck-demo.gif)
+
 A small **Go** web app and REST API to control LG TVs over the network using LG’s **Network IP Control** protocol (TCP port 9761, AES when a keycode is configured). The UI is a single vanilla-JS dashboard styled with LG brand colors and dark/light themes.
 
 ![Demo walkthrough](docs/demo.gif)
