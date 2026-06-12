@@ -1,38 +1,70 @@
 # LG WebOS Smash Deck
 
+![LG WebOS Smash Deck demo](docs/lg-webos-smash-deck-demo.gif)
 
-![Lg Webos Smash Deck demo](docs/lg-webos-smash-deck-demo.gif)
+Full LG TV remote control over the local network — no app, no cloud, no IR blaster. Speaks LG's Network IP Control protocol (TCP port 9761, AES-encrypted when a keycode is set) and exposes a dark-mode web dashboard, a REST API, and a CLI in a single Go binary.
 
-A small **Go** web app and REST API to control LG TVs over the network using LG’s **Network IP Control** protocol (TCP port 9761, AES when a keycode is configured). The UI is a single vanilla-JS dashboard styled with LG brand colors and dark/light themes.
+Part of the [Smash Deck](https://github.com/niski84/smash-deck-catalog) family of self-hosted homelab dashboards.
 
-Part of the [Smash Deck](https://github.com/niski84/smash-deck-catalog) family - self-hosted dashboards built in Go for the homelab.
+## Features
 
-## What It Does
+- **Virtual remote** — D-pad, OK, back, home, color buttons, number pad
+- **Volume control** — slider with sequential key presses so HDMI CEC and soundbars track correctly; mute toggle
+- **Input switching** — HDMI 1–4, tuner, and any connected source
+- **App launcher** — launch streaming apps by app ID (Netflix, YouTube, Prime, etc.)
+- **Picture & display** — picture mode presets, screen mute, energy saving toggle
+- **Wake-on-LAN** — power on the TV remotely
+- **Activity log** — every action timestamped in a local log
+- **REST API + CLI** — scriptable; wire the TV into Home Assistant or any automation
 
-Speaks LG's Network IP Control protocol over TCP port 9761 (with AES encryption when an 8-character keycode is configured) to drive a TV without depending on the official mobile app. The dashboard exposes a full virtual remote: D-pad, volume slider (sequential key presses so HDMI CEC and soundbars track correctly), playback controls, channels, color buttons, and a number pad.
+## API
 
-Beyond the remote it can launch streaming apps by ID, switch HDMI and tuner inputs, change picture mode, mute the screen, toggle energy saving, send Wake-on-LAN, and power the TV off. Every action is logged to a local activity log.
-
-The same binary serves the web UI, a JSON REST API, and a CLI - useful for scripting or wiring the TV into other home automation.
-
-## Tech Stack
-
-- Go (single binary, no runtime dependencies)
-- `golang.org/x/crypto` for AES keycode encryption
-- Embedded vanilla HTML, CSS, and JavaScript (no framework)
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET/POST` | `/api/settings` | Read/write TV connection settings |
+| `GET` | `/api/state` | Current TV state |
+| `POST` | `/api/power` | Power on/off |
+| `GET/POST` | `/api/volume` | Get/set volume |
+| `GET` | `/api/volume/stream` | SSE stream of volume changes |
+| `POST` | `/api/mute` | Toggle mute |
+| `POST` | `/api/key` | Send any remote key code |
+| `POST` | `/api/input` | Switch input source |
+| `POST` | `/api/app` | Launch app by ID |
+| `POST` | `/api/picture` | Set picture mode |
+| `POST` | `/api/energy` | Toggle energy saving |
+| `POST` | `/api/screenmute` | Blank/unblank the screen |
+| `GET` | `/api/logs` | Tail the activity log |
+| `GET` | `/api/macaddress` | Retrieve TV MAC address |
 
 ## Running
 
 ```bash
-go build -o lgdeck ./cmd/lgdeck
-./lgdeck
+bash scripts/reload.sh
 ```
 
-Configure via environment variables (`PORT`, `TV_IP`, `TV_MAC`, `TV_KEYCODE`, `DATA_DIR`) or through the Settings tab in the UI. Default port is 8088. Settings persist to `DATA_DIR/lgdeck-settings.json`.
+Or build manually:
 
-## Status
+```bash
+go build -o lgdeck ./cmd/lgdeck && ./lgdeck
+```
 
-Active development.
+### Configuration
+
+Set via environment variables or through the **Settings** tab in the UI. Settings persist to `DATA_DIR/lgdeck-settings.json`.
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `8088` | Listen port |
+| `TV_IP` | — | LG TV IP address |
+| `TV_MAC` | — | TV MAC address (for Wake-on-LAN) |
+| `TV_KEYCODE` | — | 8-char AES keycode (from TV settings) |
+| `DATA_DIR` | `.` | Directory for settings persistence |
+
+## Stack
+
+- Go — single binary, no runtime dependencies
+- `golang.org/x/crypto` — AES keycode encryption
+- Embedded vanilla HTML/CSS/JS — no framework, no build step
 
 ## License
 
